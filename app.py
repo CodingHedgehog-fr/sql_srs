@@ -1,30 +1,60 @@
 import streamlit as st
-import pandas as pd
 import duckdb
+import pandas as pd
+import io
 
-st.write("SQL Practice")
+csv = """
+beverage, price
+orange juice,2.5
+Expresso,2
+Tea,3
+"""
 
-option = st.selectbox(
-    "What would you like to review",
-    ("joins", "Groupby", "Windows functions"),
-    index=None,
-    placeholder="select a theme"
-)
-st.write(f"You have selected : {option}")
+beverages = pd.read_csv(io.StringIO(csv))
 
-data = {"a": [1, 2, 3], "b": [4, 5, 6]}
-df = pd.DataFrame(data)
+csv2 = """
+food_item, food_price
+cookie juice,2.5
+Chocolatine,2
+Muffin,3
+"""
 
-tab1, tab2, tab3 = st.tabs(["Cat", "Dog", "Owl"])
+food_items = pd.read_csv(io.StringIO(csv2))
 
-with tab1:
-    st.header("a Cat")
-    sql_query = st.text_area(label="Entrez votre input")
-    st.write(sql_query)
-    st.dataframe(duckdb.query(sql_query).df())
+answer = """
+select * from beverages
+cross join food_items
+"""
+
+solution = duckdb.query(answer).df()
+
+with st.sidebar:
+
+    option = st.selectbox(
+        "What would you like to review",
+        ("joins", "Groupby", "Windows functions"),
+        index=None,
+        placeholder="select a theme"
+    )
+
+    st.write(f"You have selected : {option}")
+
+st.header("Enter your code")
+query = st.text_area(label="votre code SQL ici", key="user_input")
+
+if query:
+    result = duckdb.query(query).df()
+    st.dataframe(result)
+
+tab2, tab3 = st.tabs(["Tables", "Solution"])
 
 with tab2:
-    st.header("a Dog")
+    st.write("table: beverages")
+    st.dataframe(beverages)
+    st.write("table: food_items")
+    st.dataframe(food_items)
+    st.write("Expected:")
+    st.dataframe(solution)
 
 with tab3:
-    st.header("an Owl")
+    st.write(answer)
