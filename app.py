@@ -1,7 +1,8 @@
-import streamlit as st
+import io
+
 import duckdb
 import pandas as pd
-import io
+import streamlit as st
 
 csv = """
 beverage, price
@@ -29,12 +30,11 @@ cross join food_items
 solution = duckdb.query(answer).df()
 
 with st.sidebar:
-
     option = st.selectbox(
         "What would you like to review",
         ("joins", "Groupby", "Windows functions"),
         index=None,
-        placeholder="select a theme"
+        placeholder="select a theme",
     )
 
     st.write(f"You have selected : {option}")
